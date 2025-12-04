@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:quiz/model/quiz_model.dart';
 import '../widget/answer_button.dart';
-import '../../model/question_model.dart';
 
 class QuestionScreen extends StatefulWidget {
-  final List<Questions> questions;
-  final Function(String, int) onSelectAnswer;
-  final int score;
+  // final List<Questions> questions;
+  // final Function(String, int) onSelectAnswer;
+  final Quiz quiz;
   final VoidCallback onFinish;
-  const QuestionScreen({
-    super.key,
-    required this.onFinish,
-    required this.questions,
-    required this.score,
-    required this.onSelectAnswer,
-  });
+  const QuestionScreen({super.key, required this.onFinish, required this.quiz});
 
   @override
   State<QuestionScreen> createState() => _QuestionScreenState();
@@ -21,7 +15,6 @@ class QuestionScreen extends StatefulWidget {
 
 class _QuestionScreenState extends State<QuestionScreen> {
   int questionIndex = 0;
-  int score = 0;
   String? selectedOption;
 
   void selectOption(String option) {
@@ -31,12 +24,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
   }
 
   void nextQuestion() {
-    final question = widget.questions[questionIndex];
-    if (selectedOption == question.correctAnswer) {
-      score++;
-      print("$score");
-    }
-    if (questionIndex == widget.questions.length - 1) {
+    final question = widget.quiz.questions[questionIndex];
+    widget.quiz.addAnswer(selectedOption!, question);
+    // if (selectedOption == question.correctAnswer) {
+    //   score++;
+    //   print("$score");
+    // }
+    if (questionIndex == widget.quiz.questions.length - 1) {
       widget.onFinish();
       return;
     }
@@ -49,7 +43,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final question = widget.questions[questionIndex];
+    final question = widget.quiz.questions[questionIndex];
     return Scaffold(
       backgroundColor: Colors.blue,
       body: Center(
@@ -74,7 +68,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     setState(() {
                       selectedOption = opt;
                     });
-                    widget.onSelectAnswer(opt, questionIndex);
+                    // widget.onSelectAnswer(opt, questionIndex);
                   },
                 ),
               ),

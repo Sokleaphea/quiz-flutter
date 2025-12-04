@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:quiz/data/question_data.dart';
+import 'package:quiz/model/answer_model.dart';
 // import 'package:quiz/main.dart';
-import 'package:quiz/model/question_model.dart';
-import './screen/start_screen.dart';
+import 'package:quiz/model/quiz_model.dart';
+import 'package:quiz/ui/screen/start_screen.dart';
+// import './screen/start_screen.dart';
 import './screen/questions_screen.dart';
-import '../data/question_data.dart';
+// import '../data/question_data.dart';
 import './screen/result_screen.dart';
 
 enum ScreenState { start, question, finish }
@@ -18,15 +21,23 @@ class QuizApp extends StatefulWidget {
 class _QuizAppState extends State<QuizApp> {
   ScreenState currentState = ScreenState.start;
   int score = 0;
-  int totalScore = 0;
-  List<String?> selectedAnswers = List.filled(questionList.length, null);
-  List<Questions> questions = questionList;
-
-  void selectAnswer(String option, int questionIndex) {
-    selectedAnswers[questionIndex] = option;
-    if (option == questions[questionIndex].correctAnswer) {
-      score++;
+  // int totalScore = 0;
+  // List<String?> selectedAnswers = List.filled(questionList.length, null);
+  // List<Questions> questions = questionList;
+  late Quiz quiz;
+  @override
+    void initState() {
+      super.initState();
+      quiz = Quiz(title: "Quiz", questions: questionList, answers: []);
     }
+  int currentQuestion = 0;
+  void selectAnswer(String option, int questionIndex) {
+    setState(() {
+      quiz.answers[questionIndex] = Answer(
+        answerChoice: option,
+        questions: quiz.questions[questionIndex],
+      );
+    });
   }
 
   @override
@@ -42,20 +53,16 @@ class _QuizAppState extends State<QuizApp> {
         );
       case ScreenState.question:
         return QuestionScreen(
-          onSelectAnswer: selectAnswer,
+          quiz: quiz,
           onFinish: () {
             setState(() {
               currentState = ScreenState.finish;
             });
           },
-          questions: questions,
-          score: score,
         );
       case ScreenState.finish:
         return ResultScreen(
-          selectedAnswers: selectedAnswers,
-          questions: questions,
-          score: score,
+          quiz: quiz,
           onBack: () {
             setState(() {
               currentState = ScreenState.start;
